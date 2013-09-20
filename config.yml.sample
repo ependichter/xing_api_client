@@ -1,0 +1,7 @@
+---
+:consumer_key: [PLEASE CHANGE]
+:consumer_secret: [PLEASE CHANGE]
+:callback_url:
+:host: https://api.xing.com
+:request_token_path: /v1/request_token
+:authorize_path: /v1/authorize
