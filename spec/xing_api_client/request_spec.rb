@@ -50,11 +50,75 @@ describe XingApiClient::Request do
     end
   end
 
+  describe '#make_request!' do
+    let(:url){ 'www.test.com' }
+    let(:params) { {param1: '1', param2: '2'} }
+
+    context 'get requests' do
+      let(:verb){ :get }
+
+      it 'adds the params to the url' do
+        consumer_token_object.should_receive(:request).with(:get, "www.test.com?param1=1&param2=2")
+      end
+    end
+
+    context 'post request' do
+      let(:verb){ :post }
+
+      it 'adds the params to the body' do
+        consumer_token_object.should_receive(:request).with(:post, "www.test.com", {:param1=>"1", :param2=>"2"})
+      end
+    end
+
+    after{ instance.send(:handle_request, verb, url, params) }
+  end
+
+  describe '#handle_result' do
+
+    context 'the result body is nil' do
+      let(:result){ stub('result') }
+      let(:content_type){}
+
+      before{ result.should_receive(:body).and_return(nil) }
+
+      it 'returns nil' do
+        instance.send(:handle_result, result, content_type).should be_nil
+      end
+    end
+
+    context 'the result body is not nil' do
+      let(:result){ stub('result') }
+      before{ result.stub(:body).and_return('{ "male": true }') }
+
+      context 'the content_type is == "text"' do
+        let(:content_type){ 'text' }
+
+        it 'returns a String' do
+          instance.send(:handle_result, result, content_type).should == '{ "male": true }'
+        end
+      end
+
+      context 'the content_type is nil' do
+        let(:content_type){ nil }
+
+        it 'returns a Hash' do
+          instance.send(:handle_result, result, content_type).should == { "male" => true }
+        end
+      end
+    end
+  end
+
   describe '#handle_error!' do
+    context 'If there is no error, it...' do
+      it 'does not raise' do
+        instance.send(:handle_error!, 200, {}, 200)
+      end
+    end
+
     context 'If the error is defined, it...' do
       XingApiClient::Request::ERROR_CLASSES.each_pair do |api_error_code, error_class|
         it "raises an #{error_class}" do
-          expect { instance.send(:handle_error!,'1234', 'error_name' => api_error_code) }.
+          expect { instance.send(:handle_error!,'1234', {'error_name' => api_error_code}, 200) }.
             to raise_error( error_class )
         end
       end
@@ -62,7 +126,7 @@ describe XingApiClient::Request do
 
     context 'If the error is undefined, it...' do
       it "raises an XingApiClient::Request::Error" do
-        expect { instance.send(:handle_error!,'1234', 'error_name' => 'RSPEC_TEST_EXCEPTION') }.
+        expect { instance.send(:handle_error!, '1234', {'error_name' => 'RSPEC_TEST_EXCEPTION'}, 200) }.
           to raise_error( XingApiClient::Request::Error )
       end
     end

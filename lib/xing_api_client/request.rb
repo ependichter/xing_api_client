@@ -28,25 +28,13 @@ class XingApiClient
     def make_request!(verb, url, params = nil, options = {})
       options        = { array_keys: [], allowed_codes: [200] }.merge(options)
       url            = [config.host, url].join('/')
+
       request_params = add_default_values(params)
 
-      result = if verb != :post
-        consumer_token.request(verb, url + generate_url_params(request_params))
-      else
-        consumer_token.request(verb, url, request_params)
-      end
+      result = handle_request(verb, url, request_params)
+      data   = handle_result(result, options[:content_type])
 
-      code = result.code.to_i
-
-      data = unless result.body.nil?
-        if options[:content_type] == 'text'
-          result.body
-        else
-          JSON.parse(result.body)
-        end
-      end
-
-      handle_error!(code, data) if not Array(options[:allowed_codes]).include?(code)
+      handle_error!(result.code, data, options[:allowed_codes])
 
       Array(options[:array_keys]).each { |key| data = data[key] }
 
@@ -76,7 +64,28 @@ class XingApiClient
       end
     end
 
-    def handle_error!(code, data)
+    def handle_request(verb, url, params)
+      if verb != :post
+        consumer_token.request(verb, url + generate_url_params(params))
+      else
+        consumer_token.request(verb, url, params)
+      end
+    end
+
+    def handle_result(result, content_type)
+      unless result.body.nil?
+        if content_type == 'text'
+          result.body
+        else
+          JSON.parse(result.body)
+        end
+      end
+    end
+
+    def handle_error!(code, data, allowed_codes)
+      code = code.to_i
+      return if Array(allowed_codes).include?(code)
+
       error_class = ERROR_CLASSES[data.nil? ? code : data['error_name']] || Error
 
       raise error_class.new(code, data['error_name'], data)
