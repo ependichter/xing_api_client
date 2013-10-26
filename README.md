@@ -7,6 +7,8 @@ Special thanks go to [Jan-Oliver Jahner (jojahner)](https://github.com/jojahner)
 
 Tested with ruby 1.9.3p448 and 2.0.0-p0.
 
+[![Build Status](https://api.travis-ci.org/ependichter/xing_api_client.png?branch=master)](http://travis-ci.org/ependichter/xing_api_client)
+
 ## Quickstart
 ### Make a handshake
 ```ruby
