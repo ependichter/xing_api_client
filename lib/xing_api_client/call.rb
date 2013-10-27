@@ -1,3 +1,4 @@
+require_relative './call/base.rb'
 Dir[File.dirname(__FILE__) + '/call/*.rb'].each { |name| require(name) }
 
 class XingApiClient
