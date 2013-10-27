@@ -1,5 +1,10 @@
 require 'rubygems'
 require 'bundler/setup'
+require 'coveralls'
+require 'simplecov'
+
+SimpleCov.formatter = Coveralls::SimpleCov::Formatter
+SimpleCov.start { add_filter('spec') }
 
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'xing_api_client'
