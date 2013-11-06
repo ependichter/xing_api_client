@@ -4,7 +4,7 @@ require 'open-uri'
 require 'yaml'
 require 'ostruct'
 require 'active_support/core_ext/hash/indifferent_access'
-%w{ version config object call request}.each{ |name| require "xing_api_client/#{name}"}
+%w{ version config object call request}.each{ |name| require_relative "xing_api_client/#{name}"}
 
 class XingApiClient
   include Config

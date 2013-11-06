@@ -1,6 +1,6 @@
 class XingApiClient
   class Request
-    require 'xing_api_client/request/error'
+    require_relative 'request/error'
     require 'parallel'
     include Config
     include XingApiClient::Call

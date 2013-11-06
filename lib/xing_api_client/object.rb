@@ -1,9 +1,9 @@
-require 'xing_api_client/object/base'
-require 'xing_api_client/object/user'
-require 'xing_api_client/object/address'
-require 'xing_api_client/object/company'
-require 'xing_api_client/object/school'
-require 'xing_api_client/object/year_month'
+require_relative 'object/base'
+require_relative 'object/user'
+require_relative 'object/address'
+require_relative 'object/company'
+require_relative 'object/school'
+require_relative 'object/year_month'
 
 class XingApiClient
   class Object
