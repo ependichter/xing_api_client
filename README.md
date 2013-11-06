@@ -225,8 +225,8 @@ client.request.get_users(id: 'me')
 - [ ] DELETE /v1/activities/:activity_id/like
 
 ### Profile Visits
-- [ ] GET /v1/users/:user_id/visits
-- [ ] POST /v1/users/:user_id/visits
+- [x] GET /v1/users/:user_id/visits
+- [x] POST /v1/users/:user_id/visits
 
 ### Recommendations
 - [ ] GET /v1/users/:user_id/network/recommendations

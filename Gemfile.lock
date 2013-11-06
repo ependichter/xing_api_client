@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    xing_api_client (0.0.1)
+    xing_api_client (0.0.2)
       activesupport
       bundler (~> 1.3)
       oauth
