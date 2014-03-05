@@ -77,7 +77,11 @@ class XingApiClient
         if content_type == 'text'
           result.body
         else
-          JSON.parse(result.body)
+          begin
+            JSON.parse(result.body)
+          rescue JSON::ParserError
+            raise XingApiClient::Error
+          end
         end
       end
     end
