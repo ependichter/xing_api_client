@@ -51,6 +51,21 @@ describe XingApiClient::Request do
   end
 
   describe '#make_request!' do
+    it 'adds the params to the url' do
+      params =  { some_param: 'some_value' }
+      options = { array_keys: 'users', allowed_codes: 204, content_type: 'text' }
+      request_params = { other_param: 'some_value'}
+      result = stub('result', code: 204)
+
+      instance.should_receive(:add_default_values).with(params).and_return(request_params)
+      instance.should_receive(:handle_request).with(:get, 'https://api.xing.com/v1/something', request_params).and_return(result)
+      instance.should_receive(:handle_result).with(result, options[:content_type]).and_return('users' => 'some data')
+
+      instance.send(:make_request!, :get, 'v1/something', params, options).should == 'some data'
+    end
+  end
+
+  describe '#handle_request!' do
     let(:url){ 'www.test.com' }
     let(:params) { {param1: '1', param2: '2'} }
 
