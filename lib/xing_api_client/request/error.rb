@@ -1,6 +1,8 @@
 class XingApiClient
+  class Error < StandardError; end
+
   class Request
-    class Error < StandardError
+    class Error < XingApiClient::Error
       attr_accessor :code, :api_name, :response
 
       def initialize(code, api_name, response)
