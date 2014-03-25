@@ -1,3 +1,5 @@
+require_relative 'base'
+
 class XingApiClient
   module Call
     module UsersContactsSharedCall
