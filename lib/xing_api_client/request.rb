@@ -2,6 +2,9 @@ class XingApiClient
   class Request
     require_relative 'request/error'
     require 'parallel'
+    require 'net/http/post/multipart'
+    require 'pathname'
+    require 'mimemagic'
     include Config
     include XingApiClient::Call
 
@@ -33,7 +36,6 @@ class XingApiClient
 
       result = handle_request(verb, url, request_params)
       data   = handle_result(result, options[:content_type])
-
       handle_error!(result.code, data, options[:allowed_codes])
 
       Array(options[:array_keys]).each { |key| data = data[key] }
@@ -65,11 +67,44 @@ class XingApiClient
     end
 
     def handle_request(verb, url, params)
-      if verb != :post
+      verb, multipart = verb.to_s.split('_')
+
+      if multipart
+        handle_multipart_request(verb, url, params)
+      elsif verb == "get"
         consumer_token.request(verb, url + generate_url_params(params))
       else
         consumer_token.request(verb, url, params)
       end
+    end
+
+    # Not automatic tested right now... Oo
+    def handle_multipart_request(verb, url, params)
+      uri = URI.parse(url)
+      multipart_class = case verb.to_sym
+      when :post
+        Net::HTTP::Post::Multipart
+      when :put
+        Net::HTTP::Put::Multipart
+      else
+        raise XingApiClient::Error::UnknownHttpMethodError
+      end
+      multipart_key, file_path = params.delete(:multipart).to_a.flatten
+      mimetype                 = MimeMagic.by_path file_path
+
+      raise XingApiClient::Error::FileMIMETypeUnknownError if mimetype.nil?
+
+      file_name = Pathname.new file_path
+
+      request_response = nil
+      File.open(file_path) do |image|
+        request = multipart_class.new(uri.path, multipart_key => UploadIO.new(image, mimetype, file_name))
+        consumer_token.sign! request
+        request_response = Net::HTTP.start(uri.host, uri.port, use_ssl: (uri.scheme == 'https')) do |http|
+          http.request(request)
+        end
+      end
+      request_response
     end
 
     def handle_result(result, content_type)

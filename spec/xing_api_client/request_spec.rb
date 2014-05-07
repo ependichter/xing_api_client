@@ -73,7 +73,7 @@ describe XingApiClient::Request do
       let(:verb){ :get }
 
       it 'adds the params to the url' do
-        consumer_token_object.should_receive(:request).with(:get, "www.test.com?param1=1&param2=2")
+        consumer_token_object.should_receive(:request).with("get", "www.test.com?param1=1&param2=2")
       end
     end
 
@@ -81,7 +81,39 @@ describe XingApiClient::Request do
       let(:verb){ :post }
 
       it 'adds the params to the body' do
-        consumer_token_object.should_receive(:request).with(:post, "www.test.com", {:param1=>"1", :param2=>"2"})
+        consumer_token_object.should_receive(:request).with("post", "www.test.com", {:param1=>"1", :param2=>"2"})
+      end
+    end
+
+    context 'put request' do
+      let(:verb){ :put }
+
+      it 'adds the params to the body' do
+        consumer_token_object.should_receive(:request).with("put", "www.test.com", {:param1=>"1", :param2=>"2"})
+      end
+    end
+
+    context 'delete request' do
+      let(:verb){ :delete }
+
+      it 'adds the params to the body' do
+        consumer_token_object.should_receive(:request).with("delete", "www.test.com", {:param1=>"1", :param2=>"2"})
+      end
+    end
+
+    context 'post multipart request' do
+      let(:verb){ :post_multipart }
+
+      it 'adds the params to the body' do
+        instance.should_receive(:handle_multipart_request).with("post", "www.test.com", {:param1=>"1", :param2=>"2"})
+      end
+    end
+
+    context 'put multipart request' do
+      let(:verb){ :put_multipart }
+
+      it 'adds the params to the body' do
+        instance.should_receive(:handle_multipart_request).with("put", "www.test.com", {:param1=>"1", :param2=>"2"})
       end
     end
 
