@@ -2,12 +2,12 @@ require 'spec_helper'
 
 describe XingApiClient::Request do
   subject { XingApiClient::Request }
-  let(:instance){ subject.new(consumer_token_object) }
-  let(:consumer_token_object) { double('consumer_token_object') }
+  let(:instance){ subject.new(connection) }
+  let(:connection) { double('connection') }
 
   describe '.new' do
     it 'sets the intsance variable access_token to the argument when it gets initialized' do
-      instance.instance_variable_get('@consumer_token').should == consumer_token_object
+      instance.instance_variable_get('@connection').should == connection
     end
   end
 
@@ -55,7 +55,7 @@ describe XingApiClient::Request do
       params =  { some_param: 'some_value' }
       options = { array_keys: 'users', allowed_codes: 204, content_type: 'text' }
       request_params = { other_param: 'some_value'}
-      result = stub('result', code: 204)
+      result = stub('result', status: 204)
 
       instance.should_receive(:add_default_values).with(params).and_return(request_params)
       instance.should_receive(:handle_request).with(:get, 'https://api.xing.com/v1/something', request_params).and_return(result)
@@ -73,31 +73,31 @@ describe XingApiClient::Request do
       let(:verb){ :get }
 
       it 'adds the params to the url' do
-        consumer_token_object.should_receive(:request).with("get", "www.test.com?param1=1&param2=2")
+        connection.should_receive(:get).with("www.test.com?param1=1&param2=2")
       end
     end
 
     context 'post request' do
       let(:verb){ :post }
 
-      it 'adds the params to the body' do
-        consumer_token_object.should_receive(:request).with("post", "www.test.com", {:param1=>"1", :param2=>"2"})
+      it 'adds the params to the url' do
+        connection.should_receive(:post).with("www.test.com?param1=1&param2=2")
       end
     end
 
     context 'put request' do
       let(:verb){ :put }
 
-      it 'adds the params to the body' do
-        consumer_token_object.should_receive(:request).with("put", "www.test.com", {:param1=>"1", :param2=>"2"})
+      it 'adds the params to the url' do
+        connection.should_receive(:put).with("www.test.com?param1=1&param2=2")
       end
     end
 
     context 'delete request' do
       let(:verb){ :delete }
 
-      it 'adds the params to the body' do
-        consumer_token_object.should_receive(:request).with("delete", "www.test.com", {:param1=>"1", :param2=>"2"})
+      it 'adds the params to the url' do
+        connection.should_receive(:delete).with("www.test.com?param1=1&param2=2")
       end
     end
 

@@ -3,6 +3,7 @@ require 'json'
 require 'open-uri'
 require 'yaml'
 require 'ostruct'
+require 'faraday_middleware'
 require 'active_support/core_ext/hash/indifferent_access'
 %w{ version config object call request}.each{ |name| require_relative "xing_api_client/#{name}"}
 
@@ -32,7 +33,7 @@ class XingApiClient
   end
 
   def request
-    Request.new(consumer_token)
+    Request.new(connection)
   end
 
   def self.consumer(options = {})
@@ -50,5 +51,20 @@ class XingApiClient
 private
   def consumer_token
     OAuth::ConsumerToken.new(@consumer, @access_token, @secret)
+  end
+
+  def connection
+    Faraday.new(:url => config.host) do |faraday|
+      faraday.request :multipart
+      faraday.request(:oauth, {
+                                consumer_key: config.consumer_key,
+                                consumer_secret: config.consumer_secret,
+                                token: @access_token,
+                                token_secret: @secret
+                              }
+      )
+      faraday.response :logger if config.debug
+      faraday.adapter  Faraday.default_adapter
+    end
   end
 end
