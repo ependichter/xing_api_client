@@ -40,6 +40,8 @@ client = XingApiClient.new(authorized_params[:access_token], authorized_params[:
 puts client.request.get_users.inspect
 ```
 
+[Here](https://github.com/ependichter/xing_api_client_example) you can find an minimal example with Sinatra using a callback URL.
+
 ## Before you start
 To get access to the XING API, you need a consumer key and a consumer secret. To get those you have to login to the Dev-Portal http://dev.xing.com and create a new app. Now you have a test-consumer-key which can use all calls that are listed in the documentation https://dev.xing.com/docs/resources .
 After you have developed your app, you can request a production-consumer-key by using the ‘Get a production key’-Button on the app management site (https://dev.xing.com/applications).
