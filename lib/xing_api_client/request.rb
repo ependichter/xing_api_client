@@ -31,7 +31,6 @@ class XingApiClient
     def make_request!(verb, url, params = nil, options = {})
       options        = { array_keys: [], allowed_codes: [200] }.merge(options)
       url            = [config.host, url].join('/')
-
       request_params = add_default_values(params)
 
       result = handle_request(verb, url, request_params)
@@ -108,9 +107,10 @@ class XingApiClient
       code = code.to_i
       return if Array(allowed_codes).include?(code)
 
-      error_class = ERROR_CLASSES[data.nil? ? code : data['error_name']] || Error
+      error_name  = data.nil? ? code : data['error_name']
+      error_class = ERROR_CLASSES[error_name] || Error
 
-      raise error_class.new(code, data['error_name'], data)
+      raise error_class.new(code, error_name, data)
     end
   end
 end
