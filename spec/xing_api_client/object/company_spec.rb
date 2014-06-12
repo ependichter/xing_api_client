@@ -27,7 +27,7 @@ describe XingApiClient::Object::User do
   its(:web_profiles) { should == {} }
   its(:instant_messaging_accounts) { should == {"skype"=>"username"} }
   its(:professional_experience) { should_not be_empty }
-  its(:professional_experience) { subject.professional_experience.all?{ |e| e.kind_of?(XingApiClient::Object::Company) }.should be_true }
+  its(:professional_experience) { subject.professional_experience.all?{ |e| e.kind_of?(XingApiClient::Object::Company) }.should == true }
   its(:photo_urls) { should == {"large"=>"https://x1.xingassets.com/img/users/3/5/1/238ddffce.13802856,9.140x185.jpg",
         "maxi_thumb"=>"https://x1.xingassets.com/img/users/3/5/1/238ddffce.13802856,9.70x93.jpg",
         "medium_thumb"=>"https://x1.xingassets.com/img/users/3/5/1/238ddffce.13802856,9.57x75.jpg",

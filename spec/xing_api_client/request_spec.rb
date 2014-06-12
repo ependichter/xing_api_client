@@ -44,7 +44,7 @@ describe XingApiClient::Request do
 
     context 'other values' do
       it 'returns the values untouched' do
-        test_thing = stub('something')
+        test_thing = double('something')
         instance.send(:add_default_values, other: test_thing ).should == { other: test_thing }
       end
     end
@@ -55,12 +55,14 @@ describe XingApiClient::Request do
       params =  { some_param: 'some_value' }
       options = { array_keys: 'users', allowed_codes: 204, content_type: 'text' }
       request_params = { other_param: 'some_value'}
-      result = stub('result', status: 204)
+      result = double('result', status: 204)
 
-      instance.should_receive(:add_default_values).with(params).and_return(request_params)
-      instance.should_receive(:handle_request).with(:get, 'https://api.xing.com/v1/something', request_params).and_return(result)
-      instance.should_receive(:handle_result).with(result, options[:content_type]).and_return('users' => 'some data')
+      expect(instance).to receive(:add_default_values).with(params).and_return(request_params)
+      expect(instance).to receive(:handle_request).with(:get, 'https://api.xing.com/v1/something', request_params).and_return(result)
+      expect(instance).to receive(:handle_result).with(result, options[:content_type]).and_return('users' => 'some data')
 
+require('debugger')
+debugger
       instance.send(:make_request!, :get, 'v1/something', params, options).should == 'some data'
     end
   end
@@ -81,7 +83,7 @@ describe XingApiClient::Request do
       let(:verb){ :post }
 
       it 'adds the params to the url' do
-        connection.should_receive(:post).with("www.test.com?param1=1&param2=2")
+        connection.should_receive(:post).with("www.test.com", {:param1=>"1", :param2=>"2"})
       end
     end
 
@@ -89,7 +91,7 @@ describe XingApiClient::Request do
       let(:verb){ :put }
 
       it 'adds the params to the url' do
-        connection.should_receive(:put).with("www.test.com?param1=1&param2=2")
+        connection.should_receive(:put).with("www.test.com", {:param1=>"1", :param2=>"2"})
       end
     end
 
@@ -97,7 +99,7 @@ describe XingApiClient::Request do
       let(:verb){ :delete }
 
       it 'adds the params to the url' do
-        connection.should_receive(:delete).with("www.test.com?param1=1&param2=2")
+        connection.should_receive(:delete).with("www.test.com", {:param1=>"1", :param2=>"2"})
       end
     end
 
@@ -123,7 +125,7 @@ describe XingApiClient::Request do
   describe '#handle_result' do
 
     context 'the result body is nil' do
-      let(:result){ stub('result') }
+      let(:result){ double('result') }
       let(:content_type){}
 
       before{ result.should_receive(:body).and_return(nil) }
@@ -134,7 +136,7 @@ describe XingApiClient::Request do
     end
 
     context 'the result body is not nil' do
-      let(:result){ stub('result') }
+      let(:result){ double('result') }
       before{ result.stub(:body).and_return('{ "male": true }') }
 
       context 'the content_type is == "text"' do

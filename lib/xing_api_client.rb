@@ -56,6 +56,7 @@ private
   def connection
     Faraday.new(:url => config.host) do |faraday|
       faraday.request :multipart
+      faraday.request :json
       faraday.request(:oauth, {
                                 consumer_key: config.consumer_key,
                                 consumer_secret: config.consumer_secret,

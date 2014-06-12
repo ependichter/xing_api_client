@@ -17,6 +17,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "rspec"
+  spec.add_development_dependency "rspec-its"
   spec.add_development_dependency "guard-rspec"
   spec.add_development_dependency "debugger"
   spec.add_dependency "bundler", "~> 1.3"
