@@ -72,10 +72,10 @@ class XingApiClient
 
       if multipart
         handle_multipart_request(verb, url, params)
-      else
-        # Currently, the XING API contains a bug that results sometimes in an wrong signature error if some
-        # data is sent via the body. Because of this, all parameters will be encoded and send via the url.
+      elsif verb == "get"
         connection.send(verb, url + generate_url_params(params))
+      else
+        connection.send(verb, url, params)
       end
     end
 
