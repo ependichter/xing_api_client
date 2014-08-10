@@ -2,6 +2,12 @@ class XingApiClient
   module Call
     module Base
 
+      def direct(verb, url, params, options = {})
+        verb = "#{verb}_multipart" if options[:multipart]
+
+        handle_request(verb, url, params)
+      end
+
     private
       def request_loop(total, result, offset, requested_limit, max_limit_per_call = 100)
         offset ||= 0
