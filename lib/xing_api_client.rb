@@ -23,11 +23,22 @@ class XingApiClient
 
     token = consumer.get_request_token(oauth_params)
 
-    { request_token: token, auth_url: token.authorize_url }
+    warn "[DEPRECATION] returning ':request_token' is deprecated. Please use the Hash unter the key ':oauth' with the keys ':token' and ':secret' instead."
+    { request_token: token, auth_url: token.authorize_url, oauth: { token: token.token , secret: token.secret} }
   end
 
-  def self.authorize(token, pin)
-    access_token = token.get_access_token(oauth_verifier: pin)
+  def self.authorize(token_or_hash, *args)
+    if token_or_hash.is_a?(OAuth::RequestToken)
+      warn "[DEPRECATION] calling '.authorize' with a OAuth::RequestToken is deprecated. Please use a Hash with the keys ':token',':secret' and ':verifier' instead."
+
+      token    = token_or_hash
+      verifier = args.first
+    else
+      token    = OAuth::RequestToken.new(consumer, token_or_hash[:token], token_or_hash[:secret])
+      verifier = token_or_hash[:verifier]
+    end
+
+    access_token = token.get_access_token(oauth_verifier: verifier)
 
     { access_token: access_token.token, secret: access_token.secret }
   end

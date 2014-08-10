@@ -5,25 +5,44 @@ describe XingApiClient do
   let(:instance){ subject.new('access_token_ABC123', 'secret_DEF456') }
 
   describe '.request_params' do
-    let(:token) { double('request_token', authorize_url: 'www.url.sample') }
+    let(:oauth_parameter_hash) { { token: 'request_token_ABC123', secret: 'secret_ABC123' } }
+    let(:token) { double('request_token', authorize_url: 'www.url.sample', token: oauth_parameter_hash[:token], secret: oauth_parameter_hash[:secret] ) }
     before { subject.stub_chain(:consumer, :get_request_token).and_return(token) }
 
     it 'returns a hash with a request token and a auth url' do
-      subject.request_params.should == { request_token: token, auth_url: 'www.url.sample'}
+      subject.request_params.should == { request_token: token, auth_url: 'www.url.sample', oauth: oauth_parameter_hash}
     end
   end
 
   describe '.authorize' do
-    let(:request_token) { double('request_token') }
-    let(:pin) { '1234' }
+    let(:request_token) { double('request token') }
     let(:access_token) { double('access_token', token: 'access_token_ABC123', secret: 'secret_DEF456' ) }
 
-    before do
-      request_token.should_receive(:get_access_token).with(oauth_verifier: pin).and_return(access_token)
+    context 'with a token an pin - depecated' do
+      let(:pin) { '1234' }
+
+      before do
+        request_token.should_receive(:is_a?).with(OAuth::RequestToken).and_return(true)
+        request_token.should_receive(:get_access_token).with(oauth_verifier: pin).and_return(access_token)
+      end
+
+      it 'returns a hash with a access token and a secret' do
+        subject.authorize(request_token, pin).should == { access_token: 'access_token_ABC123', secret: 'secret_DEF456'}
+      end
     end
 
-    it 'returns a hash with a access token and a secret' do
-      subject.authorize(request_token, pin).should == { access_token: 'access_token_ABC123', secret: 'secret_DEF456'}
+    context 'with a hash' do
+      let(:oauth_parameter_hash) { { token: 'request_token_ABC123', secret: 'secret_ABC123', verifier: '1234' } }
+      let(:consumer) { double('consumer') }
+      before do
+        subject.should_receive(:consumer).and_return(consumer)
+        OAuth::RequestToken.should_receive(:new).with(consumer, oauth_parameter_hash[:token], oauth_parameter_hash[:secret]).and_return(request_token)
+        request_token.should_receive(:get_access_token).with(oauth_verifier: oauth_parameter_hash[:verifier]).and_return(access_token)
+      end
+
+      it 'returns a hash with a access token and a secret' do
+        subject.authorize(oauth_parameter_hash).should == { access_token: 'access_token_ABC123', secret: 'secret_DEF456'}
+      end
     end
   end
 
