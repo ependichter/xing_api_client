@@ -61,8 +61,6 @@ describe XingApiClient::Request do
       expect(instance).to receive(:handle_request).with(:get, 'https://api.xing.com/v1/something', request_params).and_return(result)
       expect(instance).to receive(:handle_result).with(result, options[:content_type]).and_return('users' => 'some data')
 
-require('debugger')
-debugger
       instance.send(:make_request!, :get, 'v1/something', params, options).should == 'some data'
     end
   end
