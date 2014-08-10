@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    xing_api_client (0.0.3)
+    xing_api_client (0.0.4)
       activesupport
       bundler
       faraday
