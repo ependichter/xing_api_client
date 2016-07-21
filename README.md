@@ -30,8 +30,11 @@ puts "Please enter the pin:"
 pin = gets.chomp.strip
 
 # Authorize the handshake and get the token and secret
-authorized_params = XingApiClient.authorize(request_params[:request_token], pin)
-puts authorized_params.inspect # { access_token: 'abcde', secret: '12345' }
+authorized_params = XingApiClient.authorize({
+  token: request_params[:request_token].token,
+  secret: request_params[:request_token].secret,
+  verifier: pin
+})
 
 # Initialize a client
 client = XingApiClient.new(authorized_params[:access_token], authorized_params[:secret])
@@ -242,5 +245,3 @@ client.request.get_users(id: 'me')
 ### Geo Locations
 - [ ] GET /v1/users/:user_id/nearby_users
 - [ ] PUT /v1/users/:user_id/geo_location
-
-
